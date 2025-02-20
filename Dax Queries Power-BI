@@ -1,0 +1,81 @@
+
+1. Total Lung Cancer Cases
+Total Lung Cancer Cases = COUNTROWS('LungCancerData')
+
+2. Average Age of Lung Cancer Patients
+Average Age of Lung Cancer Patients = AVERAGE('LungCancerData'[Age])
+
+3. Percentage of Smokers with Lung Cancer
+Percentage of Smokers with Lung Cancer = 
+DIVIDE(CALCULATE(COUNTROWS('LungCancerData'), 'LungCancerData'[Smoker] = "Yes"), COUNTROWS('LungCancerData'))
+
+This calculates the count of smokers with lung cancer and divides it by the total number of lung cancer cases to get the percentage.
+
+4. Mortality Rate for Lung Cancer Patients
+Mortality Rate for Lung Cancer Patients = 
+DIVIDE(CALCULATE(COUNTROWS('LungCancerData'), 'LungCancerData'[Survived] = "No"), COUNTROWS('LungCancerData'))
+
+This formula counts the number of deceased patients (where "Survived" = "No") and divides it by the total number of lung cancer cases to get the mortality rate.
+
+
+5. Total Smokers
+Total Smokers = CALCULATE(COUNTROWS('LungCancerData'), 'LungCancerData'[Smoker] = "Yes")
+
+6. Average Years of Smoking
+Average Years of Smoking = AVERAGE('LungCancerData'[YearsSmoking])
+
+7. High-Risk Patients (Risk Score > 5)
+High-Risk Patients = CALCULATE(COUNTROWS('LungCancerData'), 'LungCancerData'[RiskScore] > 5)
+
+8. Early Detection Rate
+Early Detection Rate = 
+DIVIDE(
+    CALCULATE(COUNTROWS('LungCancerData'), DATEDIFF('LungCancerData'[SymptomsDate], 'LungCancerData'[DiagnosisDate], MONTH) <= 6),
+    COUNTROWS('LungCancerData')
+)
+This formula calculates the percentage of lung cancer cases where the diagnosis was made within 6 months of the first symptoms.
+
+
+9. Average Survival Years
+Average Survival Years = AVERAGE('LungCancerData'[SurvivalTime])
+
+10. Total Annual Lung Cancer Deaths
+Total Annual Lung Cancer Deaths = 
+CALCULATE(
+    COUNTROWS('LungCancerData'),
+    NOT(ISBLANK('LungCancerData'[DeathDate])),
+    YEAR('LungCancerData'[DeathDate]) = YEAR(TODAY()) // This will return deaths for the current year
+)
+This will count the number of lung cancer-related deaths in the current year. You can adjust the year condition as needed for other years or use a dynamic slicer for annual comparisons.
+
+11. Lung Cancer Prevalence Rate
+Lung Cancer Prevalence Rate = 
+DIVIDE(CALCULATE(COUNTROWS('LungCancerData')), [Total Population]) 
+
+Where [Total Population] would be a reference to the total population, either as a fixed value or another measure if you have it in your dataset.
+
+12. Survival Rate by Early Detection
+Survival Rate by Early Detection = 
+DIVIDE(
+    CALCULATE(COUNTROWS('LungCancerData'), 
+              'LungCancerData'[EarlyDetection] = "Yes", 
+              'LungCancerData'[Survived] = "Yes"),
+    CALCULATE(COUNTROWS('LungCancerData'), 'LungCancerData'[EarlyDetection] = "Yes")
+)
+This formula calculates the survival rate for patients who were diagnosed early (within 6 months of symptoms). It divides the number of survivors in this group by the total number of early-detected patients.
+
+13. Risk_Score = 
+    VAR SmokingRisk = IF(lung_cancer_data[Smoker] = "yes", 3, 0)
+    VAR PassiveSmokingRisk = IF(lung_cancer_data[Passive_Smoker] = "yes", 2, 0)
+    VAR FamilyHistoryRisk = IF(lung_cancer_data[Family_History] = "yes", 2, 0)
+    VAR AirPollutionRisk = IF(lung_cancer_data[Air_Pollution_Exposure] = "High", 3, IF(lung_cancer_data[Air_Pollution_Exposure] = "Moderate", 1, 0))
+
+    RETURN SmokingRisk + PassiveSmokingRisk + FamilyHistoryRisk + AirPollutionRisk
+
+14. Age_Group = 
+SWITCH(
+    TRUE(),
+    lung_cancer_data[Age] <= 30, "0-30",
+    lung_cancer_data[Age] <= 45, "31-45",
+    lung_cancer_data[Age] <= 60, "46-60",
+    "61+")
